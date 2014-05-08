@@ -1,0 +1,10 @@
+{
+"name": "sales_dashboard", 
+"version": "0.0.1",
+"description": "Minimalist dashboard", 
+"dependencies": {
+	"socket.io": "~0.9.6",
+    "mime": "~1.2.7",
+	"restify": "~2.0.0"
+ }
+}
