@@ -9,7 +9,7 @@ $(document).ready(function () {
     socket.on('all_sales', function (results) {
 		keys = Object.keys(results);
 		keys.forEach(function(key){
-		  $("li").append("<ul id=\"ul_"+results[key].person+"\">"+results[key].person+" "+results[key].amount+"</ul>")
+		  $("li").append("<ul id=\"ul_"+key+"\">"+key+" "+results[key]+"</ul>")
 		})
     });
 });
