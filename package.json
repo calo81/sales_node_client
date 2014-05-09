@@ -5,6 +5,7 @@
 "dependencies": {
 	"socket.io": "~0.9.6",
     "mime": "~1.2.7",
+	"extsprintf": "1.0.0",
 	"restify": "~2.0.0"
  }
 }

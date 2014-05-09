@@ -4,7 +4,8 @@ var http = require('http')
  , mime = require('mime')
  , restify = require('restify')
  , server = restify.createServer()
- , cache = {};
+ , cache = {}
+ , sales = {}
  
 function send404(response) {
   response.writeHead(404, {'Content-Type': 'text/plain'});
@@ -41,10 +42,16 @@ function serveStatic(response, cache, absPath) {
   }
 }
 
-server.get('/sale', function(req, res, next) {
-        res.setHeader('Content-Type', 'text/html');
-        res.writeHead(200);
-        taskBoardServer.sockets[0].broadcast.emit('sale', "sdfsdf");
+server.get('/sale/:consultant/:policy', function(req, res, next) {
+		res.send('ok');
+		if(sales[req.params.consultant]){
+		  sales[req.params.consultant]++;	
+		}else{
+		  sales[req.params.consultant] = 1;	
+		}
+		console.log(sales[req.params.consultant]);
+        taskBoardServer.sockets[0].broadcast.emit('sale_broadcast', {id: req.params.policy, person: req.params.consultant, amount: sales[req.params.consultant]});
+		return next();
 });
 
 server.get(/.*/, restify.serveStatic({
