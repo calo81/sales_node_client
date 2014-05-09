@@ -5,7 +5,6 @@ var http = require('http')
  , restify = require('restify')
  , server = restify.createServer()
  , cache = {}
- , sales = {}
  
 function send404(response) {
   response.writeHead(404, {'Content-Type': 'text/plain'});
@@ -44,13 +43,12 @@ function serveStatic(response, cache, absPath) {
 
 server.get('/sale/:consultant/:policy', function(req, res, next) {
 		res.send('ok');
-		if(sales[req.params.consultant]){
-		  sales[req.params.consultant]++;	
+		if(taskBoardServer.sales[req.params.consultant]){
+		  taskBoardServer.sales[req.params.consultant]++;	
 		}else{
-		  sales[req.params.consultant] = 1;	
+		  taskBoardServer.sales[req.params.consultant] = 1;	
 		}
-		console.log(sales[req.params.consultant]);
-        taskBoardServer.sockets[0].broadcast.emit('sale_broadcast', {id: req.params.policy, person: req.params.consultant, amount: sales[req.params.consultant]});
+        taskBoardServer.sockets[0].broadcast.emit('sale_broadcast', {id: req.params.policy, person: req.params.consultant, amount: taskBoardServer.sales[req.params.consultant]});
 		return next();
 });
 
