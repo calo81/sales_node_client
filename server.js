@@ -5,7 +5,8 @@ var http = require('http')
  , restify = require('restify')
  , server = restify.createServer()
  , cache = {}
- 
+
+server.use(restify.bodyParser()); 
 function send404(response) {
   response.writeHead(404, {'Content-Type': 'text/plain'});
   response.write('Error 404: resource not found.');
@@ -18,6 +19,19 @@ function sendFile(response, filePath, fileContents) {
     {"content-type": mime.lookup(path.basename(filePath))}
   );
   response.end(fileContents);
+}
+
+function saleReceived(person, amount, policy){
+	if(taskBoardServer.sales[person]){
+	  taskBoardServer.sales[person]["quantity"]++;
+	  taskBoardServer.sales[person]["amount"] += parseFloat(amount);	
+	}else{
+	  taskBoardServer.sales[person] = {};	
+	  taskBoardServer.sales[person]["quantity"] = 1;	
+	  taskBoardServer.sales[person]["amount"] = parseFloat(amount);	
+	}
+    taskBoardServer.sockets[0].broadcast.emit('sale_broadcast', {id: policy, person: person, quantity: taskBoardServer.sales[person]["quantity"], amount: taskBoardServer.sales[person]["amount"]});
+  	
 }
 
 function serveStatic(response, cache, absPath) {
@@ -41,17 +55,16 @@ function serveStatic(response, cache, absPath) {
   }
 }
 
+server.post('/sale', function(req, res, next){
+  res.send('ok');
+  console.log(req.body);
+  params = JSON.parse(req.body);
+  saleReceived(params.person, params.amount, params.id);
+  return next();
+});
 server.get('/sale/:consultant/:amount', function(req, res, next) {
 		res.send('ok');
-		if(taskBoardServer.sales[req.params.consultant]){
-		  taskBoardServer.sales[req.params.consultant]["quantity"]++;
-		  taskBoardServer.sales[req.params.consultant]["amount"] += parseFloat(req.params.amount);	
-		}else{
-		  taskBoardServer.sales[req.params.consultant] = {};	
-		  taskBoardServer.sales[req.params.consultant]["quantity"] = 1;	
-		  taskBoardServer.sales[req.params.consultant]["amount"] = parseFloat(req.params.amount);	
-		}
-        taskBoardServer.sockets[0].broadcast.emit('sale_broadcast', {id: req.params.policy, person: req.params.consultant, quantity: taskBoardServer.sales[req.params.consultant]["quantity"], amount: taskBoardServer.sales[req.params.consultant]["amount"]});
+		saleReceived(req.params.consultant, req.params.amount, 'x')
 		return next();
 });
 
