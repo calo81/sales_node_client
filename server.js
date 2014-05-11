@@ -41,14 +41,17 @@ function serveStatic(response, cache, absPath) {
   }
 }
 
-server.get('/sale/:consultant/:policy', function(req, res, next) {
+server.get('/sale/:consultant/:amount', function(req, res, next) {
 		res.send('ok');
 		if(taskBoardServer.sales[req.params.consultant]){
-		  taskBoardServer.sales[req.params.consultant]++;	
+		  taskBoardServer.sales[req.params.consultant]["quantity"]++;
+		  taskBoardServer.sales[req.params.consultant]["amount"] += parseFloat(req.params.amount);	
 		}else{
-		  taskBoardServer.sales[req.params.consultant] = 1;	
+		  taskBoardServer.sales[req.params.consultant] = {};	
+		  taskBoardServer.sales[req.params.consultant]["quantity"] = 1;	
+		  taskBoardServer.sales[req.params.consultant]["amount"] = parseFloat(req.params.amount);	
 		}
-        taskBoardServer.sockets[0].broadcast.emit('sale_broadcast', {id: req.params.policy, person: req.params.consultant, amount: taskBoardServer.sales[req.params.consultant]});
+        taskBoardServer.sockets[0].broadcast.emit('sale_broadcast', {id: req.params.policy, person: req.params.consultant, quantity: taskBoardServer.sales[req.params.consultant]["quantity"], amount: taskBoardServer.sales[req.params.consultant]["amount"]});
 		return next();
 });
 
